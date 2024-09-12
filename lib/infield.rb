@@ -11,11 +11,12 @@ module Infield
   autoload :DeprecationWarning, "#{__dir__}/infield/deprecation_warning.rb"
 
   class << self
-    attr_accessor :api_key, :repo_environment_id, :environment
+    attr_accessor :api_key, :repo_environment_id, :environment, :infield_api_url
 
     def run(api_key: nil, repo_environment_id: nil, environment: nil)
       @api_key = api_key || ENV['INFIELD_API_KEY']
       @repo_environment_id = repo_environment_id
+      @infield_api_url = ENV['INFIELD_API_URL'] || 'https://app.infield.ai'
       raise 'API key is required' unless @api_key
       raise 'repo_environment_id is required' unless @repo_environment_id
 

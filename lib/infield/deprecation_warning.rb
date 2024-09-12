@@ -30,7 +30,7 @@ module Infield
         end
 
         def infield_api_uri
-          URI.parse(ENV['INFIELD_API_URL'] || 'http://127.0.0.1:3000' || 'https://app.infield.ai')
+          URI.parse(Infield.infield_api_url)
         end
 
         def upload_message(task)
