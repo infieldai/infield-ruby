@@ -19,7 +19,13 @@ module Infield
         end
 
         def run
-          Thread.new { loop { event.wait.then { deliver }.then { event.reset } } }
+          Thread.new do
+            loop do
+              event.wait
+              deliver
+              event.reset
+            end
+          end
         end
 
         private
