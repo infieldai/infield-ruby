@@ -58,7 +58,6 @@ module Infield
 
     class << self
       def log(*messages, callstack: nil, validated: false)
-        callstack ||= caller_locations(2)
         messages = messages.select(&method(:valid_message)) unless validated
         messages.each { |message| tasks << Task.new(message, callstack) }
         Runner.event.set
