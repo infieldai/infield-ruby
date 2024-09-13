@@ -40,10 +40,12 @@ module Infield
         end
 
         def upload_message(task)
-          http = Net::HTTP.new(infield_api_uri.host, infield_api_uri.port)
-          http.post('/api/raw_deprecation_warnings',
-                    default_api_params.merge(message: task.message).to_json,
-                    { 'Content-Type' => 'application/json', 'Authorization' => "bearer #{Infield.api_key}" })
+          uri = infield_api_uri
+          Net::HTTP.start(uri.host, uri.port, use_ssl: (uri.scheme == 'https')) do |http|
+            http.post('/api/raw_deprecation_warnings',
+                      default_api_params.merge(message: task.message).to_json,
+                      { 'Content-Type' => 'application/json', 'Authorization' => "bearer #{Infield.api_key}" })
+          end
         end
 
         def deliver
