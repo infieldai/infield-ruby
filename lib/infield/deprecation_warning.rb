@@ -15,9 +15,17 @@ module Infield
       class << self
         attr_reader :queue
 
-        def run(sleep_interval: 1, batch_size: 20)
+        def enqueue(message)
+          return if @queue.size >= @queue_limit
+          @queue << message
+        end
+
+        def run(sleep_interval: 5, batch_size: 10, queue_limit: 30)
           @queue ||= Queue.new
           @sleep_interval = sleep_interval
+          # Queue cannot be larger than this. If more than this number of messages come in
+          # before the next wake interval any extra are dropped
+          @queue_limit = queue_limit
           @batch_size = batch_size # send up to 20 messages to API at once
 
           Thread.new do
@@ -64,7 +72,7 @@ module Infield
     class << self
       def log(*messages, callstack: nil, validated: false)
         messages = messages.select(&method(:valid_message)) unless validated
-        messages.each { |message| Runner.queue << Task.new(message, callstack) }
+        messages.each { |message| Runner.enqueue(Task.new(message, callstack)) }
         true
       end
 
