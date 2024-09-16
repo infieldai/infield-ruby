@@ -12,6 +12,15 @@ module Infield
 
     # Handles spinning up a thread to process work
     module Runner
+      # The list of errors ::Net::HTTP is known to raise
+      # See https://github.com/ruby/ruby/blob/b0c639f249165d759596f9579fa985cb30533de6/lib/bundler/fetcher.rb#L281-L286
+      HTTP_ERRORS = [
+        Timeout::Error, EOFError, SocketError, Errno::ENETDOWN, Errno::ENETUNREACH,
+        Errno::EINVAL, Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EAGAIN,
+        Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError,
+        Zlib::BufError, Errno::EHOSTUNREACH, Errno::ECONNREFUSED
+      ].freeze
+
       class << self
         attr_reader :queue
 
@@ -65,6 +74,7 @@ module Infield
                       default_api_params.merge(messages: messages).to_json,
                       { 'Content-Type' => 'application/json', 'Authorization' => "bearer #{Infield.api_key}" })
           end
+        rescue *HTTP_ERRORS => e
         end
       end
     end
