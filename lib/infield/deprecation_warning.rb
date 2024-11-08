@@ -25,6 +25,7 @@ module Infield
         attr_reader :queue
 
         def enqueue(message)
+          @queue ||= Queue.new
           return if @queue.size >= @queue_limit
           @queue << message
         end
