@@ -18,6 +18,10 @@ Then in `config/application.rb`:
                   repo_environment_id: ENV['INFIELD_REPO_ENVIRONMENT_ID')
     end
 
+And in any environment you want to profile from:
+
+    config.active_support.deprecation = :notify
+
 ## Configuration options
 
 The infield gem batches requests and sends them asyncronously. You can configure the following options to `Infield.run` (defaults shown here):
