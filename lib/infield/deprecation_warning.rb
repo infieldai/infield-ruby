@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-require 'thread'
-require 'json'
-require 'net/http'
-
 module Infield
   # Takes in new deprecation warnings and sends them to the Infield API
   # in batches
@@ -22,7 +18,7 @@ module Infield
       ].freeze
 
       class << self
-        attr_reader :queue
+        attr_reader :queue, :thread
 
         def enqueue(message)
           @queue ||= Queue.new
@@ -38,7 +34,7 @@ module Infield
           @queue_limit = queue_limit
           @batch_size = batch_size # send up to 20 messages to API at once
 
-          Thread.new do
+          @thread = Thread.new do
             loop do
               sleep(@sleep_interval)
               next if @queue.empty?
