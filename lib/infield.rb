@@ -18,7 +18,7 @@ module Infield
   class << self
     attr_accessor :api_key, :repo_environment_id, :environment, :infield_api_url
 
-    def run(api_key: nil, repo_environment_id: nil, environment: nil, sleep_interval: 5, batch_size: 10, queue_limit: 30, heartbeat_interval: 60)
+    def run(api_key: nil, repo_environment_id: nil, environment: nil, sleep_interval: 5, batch_size: 10, queue_limit: 30, heartbeat_interval: 600)
       @api_key = api_key || ENV['INFIELD_API_KEY']
       @repo_environment_id = repo_environment_id
       @infield_api_url = ENV['INFIELD_API_URL'] || 'https://app.infield.ai'
