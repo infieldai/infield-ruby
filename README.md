@@ -4,7 +4,7 @@ This gem handles reporting deprecation warnings to Infield from a Rails app.
 
 ## Setup
 
-You'll need an API key and repo environment ID to use this gem. Get your API key from https://app.infield.ai/settings/api_key and your environment ID from the environments configuration page.
+You'll need an API key and repo environment ID to use this gem. You can find these at https://app.infield.ai/deprecations after signing up.
 
 Add the gem to your gemfile:
 
