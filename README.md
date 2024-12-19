@@ -15,7 +15,7 @@ Then in `config/application.rb`:
     if ENV['INFIELD_API_KEY']
       require 'infield'
       Infield.run(api_key: ENV['INFIELD_API_KEY'],
-                  repo_environment_id: ENV['INFIELD_REPO_ENVIRONMENT_ID')
+                  repo_environment_id: ENV['INFIELD_REPO_ENVIRONMENT_ID'])
     end
 
 And in any environment you want to profile from:
