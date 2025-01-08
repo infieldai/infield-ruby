@@ -6,7 +6,7 @@ require 'net/http'
 
 require_relative 'infield/version'
 
-# require_relative 'infield/core_ext'
+require_relative 'infield/core_ext'
 require_relative 'infield/rails' if defined?(Rails)
 
 module Infield
