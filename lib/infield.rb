@@ -6,7 +6,7 @@ require 'net/http'
 
 require_relative 'infield/version'
 
-# require_relative 'infield/core_ext'
+require_relative 'infield/core_ext'
 require_relative 'infield/rails' if defined?(Rails)
 
 module Infield
@@ -25,7 +25,7 @@ module Infield
       raise 'API key is required' unless @api_key
       raise 'repo_environment_id is required' unless @repo_environment_id
 
-      @environment = environment || defined?(Rails) ? Rails.env : nil
+      @environment = environment || (defined?(Rails) ? Rails.env : nil)
 
       # Start the deprecation warning processor
       DeprecationWarning::Runner.run(sleep_interval: sleep_interval, batch_size: batch_size, queue_limit: queue_limit)

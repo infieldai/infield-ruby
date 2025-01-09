@@ -10,5 +10,24 @@ module Infield
     end
   end
 
-  Kernel.prepend(Core)
+  module InfieldWarningCapture
+    if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.0")
+      # Ruby 3.0+ supports warn(msg, category: nil, **kwargs)
+      def warn(msg, category: nil, **kwargs)
+        super
+
+        Infield::DeprecationWarning.log(msg, callstack: caller_locations, validated: true) if category == :deprecated
+      end
+    else
+      # Ruby < 3.0 only provides a single argument to warn
+      def warn(msg)
+        super
+
+        Infield::DeprecationWarning.log(msg, callstack: caller_locations, validated: false)
+      end
+    end
+  end
+
+  Kernel.extend(Core)
+  Warning.extend(InfieldWarningCapture)
 end

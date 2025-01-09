@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require 'debug'
 
 module Infield
   module Heartbeat
