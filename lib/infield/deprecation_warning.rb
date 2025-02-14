@@ -44,6 +44,23 @@ module Infield
           end
         end
 
+        def post_deprecation_warnings(tasks)
+          messages = tasks.map { |w| { message: w.message, callstack: w.callstack.map(&:to_s) } }
+
+          uri = infield_api_uri
+          Net::HTTP.start(uri.host, uri.port, use_ssl: (uri.scheme == 'https')) do |http|
+            http.post('/api/raw_deprecation_warnings',
+                      { raw_deprecation_warnings: {
+                          repo_environment_id: Infield.repo_environment_id,
+                          environment: Infield.environment,
+                          messages: messages
+                        }
+                      }.to_json,
+                      { 'Content-Type' => 'application/json', 'Authorization' => "bearer #{Infield.api_key}" })
+          end
+        rescue *HTTP_ERRORS => e
+        end
+
         private
 
         def process_queue
@@ -61,17 +78,6 @@ module Infield
 
         def infield_api_uri
           URI.parse(Infield.infield_api_url)
-        end
-
-        def post_deprecation_warnings(tasks)
-          messages = tasks.map { |w| { message: w.message } }
-          uri = infield_api_uri
-          Net::HTTP.start(uri.host, uri.port, use_ssl: (uri.scheme == 'https')) do |http|
-            http.post('/api/raw_deprecation_warnings',
-                      default_api_params.merge(messages: messages).to_json,
-                      { 'Content-Type' => 'application/json', 'Authorization' => "bearer #{Infield.api_key}" })
-          end
-        rescue *HTTP_ERRORS => e
         end
       end
     end
