@@ -4,6 +4,9 @@ module Infield
   class Railtie < Rails::Railtie
     initializer 'infield.enable_report_deprecations', before: 'active_support.deprecation_behavior' do |app|
       app.config.active_support.report_deprecations = true
+      if defined?(ActiveSupport::Deprecation.silenced)
+        ActiveSupport::Deprecation.silenced = false
+      end
     end
 
     initializer 'infield.deprecation_warnings', after: 'active_support.deprecation_behavior' do |app|
@@ -11,7 +14,7 @@ module Infield
         Infield::DeprecationWarning.log(message, callstack: callstack, validated: true)
       end
 
-      # Rails >= 7.0 makes it so that there are named deprecators that can have their own behavior
+      # Rails >= 7.1 makes it so that there are named deprecators that can have their own behavior
       if app.respond_to?(:deprecators)
         app.deprecators.each do |deprecator|
           current_behaviors = Array(deprecator.behavior)
