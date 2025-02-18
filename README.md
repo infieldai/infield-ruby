@@ -18,6 +18,9 @@ Then in `config/application.rb`:
                   repo_environment_id: ENV['INFIELD_REPO_ENVIRONMENT_ID'])
     end
 
+Only call `Infield.run` in environments that you want deprecation warnings to print for, since it will bypass configurations such as `config.active_support.report_deprecations = false`
+and `config.active_support.deprecation = :silence`
+
 ## Configuration options
 
 The infield gem batches requests and sends them asyncronously. You can configure the following options to `Infield.run` (defaults shown here):
