@@ -48,6 +48,15 @@ module Infield
           messages = tasks.map { |w| { message: w.message, callstack: w.callstack.map(&:to_s) } }
 
           uri = infield_api_uri
+
+          webmock_needs_re_enabling = false
+          if defined?(WebMock) && WebMock.respond_to?(:net_connect_allowed?) &&
+             !WebMock.net_connect_allowed?(Infield.infield_api_url)
+            webmock_needs_re_enabling = true
+            allowed = WebMock::Config.instance.allow
+            WebMock.disable_net_connect!(allow: Infield.infield_api_url)
+          end
+
           Net::HTTP.start(uri.host, uri.port, use_ssl: (uri.scheme == 'https')) do |http|
             http.post('/api/raw_deprecation_warnings',
                       { raw_deprecation_warnings: {
@@ -59,6 +68,10 @@ module Infield
                       { 'Content-Type' => 'application/json', 'Authorization' => "bearer #{Infield.api_key}" })
           end
         rescue *HTTP_ERRORS => e
+        ensure
+          if webmock_needs_re_enabling
+            WebMock.disable_net_connect!(allow: allowed)
+          end
         end
 
         private
