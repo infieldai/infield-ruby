@@ -57,11 +57,16 @@ module Infield
             WebMock.disable_net_connect!(allow: Infield.infield_api_url)
           end
 
+          if defined?(Rails) && Rails.respond_to?(:root)
+            rails_root = Rails.root.to_s
+          end
+
           Net::HTTP.start(uri.host, uri.port, use_ssl: (uri.scheme == 'https')) do |http|
             http.post('/api/raw_deprecation_warnings',
                       { raw_deprecation_warnings: {
                           repo_environment_id: Infield.repo_environment_id,
                           environment: Infield.environment,
+                          root_dir: rails_root,
                           messages: messages
                         }
                       }.to_json,
