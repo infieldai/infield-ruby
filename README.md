@@ -4,6 +4,8 @@ Maintainers use deprecation warnings to inform developers about breaking changes
 
 This differs from local-only tools like deprecation_toolkit in that warnings are sent up to a cloud-hosted API rather than stored in files locally. This makes it possible to profile for deprecations not just in dev/test but staging and production too.
 
+`infield` supports warnings coming from gems and Ruby itself.
+
 ## Setup
 
 You'll need an API key and repo environment ID to use this gem. You can find these at https://app.infield.ai/deprecations after signing up.
