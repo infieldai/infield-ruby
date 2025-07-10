@@ -1,6 +1,8 @@
-# Infield
+# What is this gem for?
 
-This gem handles reporting deprecation warnings to Infield from a Rails app.
+Maintainers use deprecation warnings to inform developers about breaking changes coming in new versions. To make these warnings actionable you need to monitor for them. This gem takes care of aggregating these warnings from any environment and sending them to the Infield API. Within Infield you can see all deprecations being thrown and verify once they've been fixed.
+
+This differs from local-only tools like deprecation_toolkit in that warnings are sent up to a cloud-hosted API rather than stored in files locally. This makes it possible to profile for deprecations not just in dev/test but staging and production too.
 
 ## Setup
 
