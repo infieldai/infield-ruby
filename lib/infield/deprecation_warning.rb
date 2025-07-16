@@ -49,6 +49,8 @@ module Infield
 
           uri = infield_api_uri
 
+          git_branch, git_sha = git_info
+
           webmock_needs_re_enabling = false
           if defined?(WebMock) && WebMock.respond_to?(:net_connect_allowed?) &&
              !WebMock.net_connect_allowed?(Infield.infield_api_url)
@@ -67,6 +69,8 @@ module Infield
                           repo_environment_id: Infield.repo_environment_id,
                           environment: Infield.environment,
                           root_dir: rails_root,
+                          git_sha: git_sha,
+                          git_branch: git_branch,
                           messages: messages
                         }
                       }.to_json,
@@ -92,6 +96,35 @@ module Infield
         def default_api_params
           { repo_environment_id: Infield.repo_environment_id,
             environment: Infield.environment }
+        end
+
+        def git_info
+          branch = nil
+          sha = nil
+
+          if ENV['CIRCLE_SHA1']
+            sha = ENV['CIRCLE_SHA1']
+            branch = ENV['CIRCLE_BRANCH']
+          elsif ENV['GITHUB_SHA']
+            sha = ENV['GITHUB_SHA']
+            if ENV['GITHUB_REF_NAME']
+              branch = ENV['GITHUB_REF_NAME']
+            elsif ENV['GITHUB_REF']&.start_with?('refs/heads/')
+              branch = ENV['GITHUB_REF'].split('/', 3).last
+            elsif ENV['GITHUB_HEAD_REF']
+              branch = ENV['GITHUB_HEAD_REF']
+            end
+          elsif ENV['HEROKU_SLUG_COMMIT']
+            sha = ENV['HEROKU_SLUG_COMMIT']
+          elsif defined?(Rails) && Rails.respond_to?(:root)
+            root = Rails.root.to_s
+            if system('git', '-C', root, 'rev-parse', '--is-inside-work-tree', out: File::NULL, err: File::NULL)
+              sha = `git -C #{root} rev-parse HEAD`.strip
+              branch = `git -C #{root} rev-parse --abbrev-ref HEAD`.strip
+            end
+          end
+
+          [branch, sha]
         end
 
         def infield_api_uri
