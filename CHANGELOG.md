@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.8.0] - 2025-07-17
+
+  - Send git info alongside deprecation warnings.
+
 ## [0.7.0] - 2025-04-16
 
   - Send Rails.root alongside deprecation warnings so they can be hidden from callstacks
