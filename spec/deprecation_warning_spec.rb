@@ -42,6 +42,8 @@ RSpec.describe Infield::DeprecationWarning do
       let(:task) { Infield::DeprecationWarning::Task.new(message, callstack) }
 
       before do
+        ENV['CIRCLE_SHA1'] = 'abc123'
+        ENV['CIRCLE_BRANCH'] = 'main'
         allow(Infield).to receive(:repo_environment_id).and_return('test-repo-id')
         allow(Infield).to receive(:environment).and_return('test')
         allow(Infield).to receive(:infield_api_url).and_return('https://api.infield.com')
@@ -57,6 +59,8 @@ RSpec.describe Infield::DeprecationWarning do
               raw_deprecation_warnings: {
                 repo_environment_id: 'test-repo-id',
                 environment: 'test',
+                git_sha: 'abc123',
+                git_branch: 'main',
                 messages: [
                   {
                     message: message,
@@ -67,6 +71,11 @@ RSpec.describe Infield::DeprecationWarning do
             }.to_json
           )
           .to_return(status: 200)
+      end
+
+      after do
+        ENV.delete('CIRCLE_SHA1')
+        ENV.delete('CIRCLE_BRANCH')
       end
 
       it 'sends the deprecation warning to the Infield API' do
@@ -80,6 +89,44 @@ RSpec.describe Infield::DeprecationWarning do
         expect {
           described_class.post_deprecation_warnings([task])
         }.not_to raise_error
+      end
+      context 'when only CIRCLE_SHA1 is set' do
+        before do
+          ENV['CIRCLE_SHA1'] = 'def456'
+          ENV.delete('CIRCLE_BRANCH')
+
+          stub_request(:post, 'https://api.infield.com/api/raw_deprecation_warnings')
+            .with(
+              headers: {
+                'Content-Type' => 'application/json',
+                'Authorization' => 'bearer test-api-key'
+              },
+              body: {
+                raw_deprecation_warnings: {
+                  repo_environment_id: 'test-repo-id',
+                  environment: 'test',
+                  git_sha: 'def456',
+                  git_branch: nil,
+                  messages: [
+                    {
+                      message: message,
+                      callstack: callstack.map(&:to_s)
+                    }
+                  ]
+                }
+              }.to_json
+            )
+            .to_return(status: 200)
+        end
+
+        after do
+          ENV.delete('CIRCLE_SHA1')
+        end
+
+        it 'still sends the sha without a branch' do
+          described_class.post_deprecation_warnings([task])
+          assert_requested(:post, 'https://api.infield.com/api/raw_deprecation_warnings', times: 1)
+        end
       end
     end
   end
