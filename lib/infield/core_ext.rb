@@ -29,5 +29,5 @@ module Infield
   end
 
   Kernel.extend(Core)
-  Warning.extend(InfieldWarningCapture)
+  Warning.extend(InfieldWarningCapture) if defined?(Warning)
 end
