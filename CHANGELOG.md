@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.8.1] - 2026-04-15
+
+  - Guard `Warning.extend` so the gem loads on Ruby < 2.4 where the `Warning` module is not defined.
+
 ## [0.8.0] - 2025-07-17
 
   - Send git info alongside deprecation warnings.
