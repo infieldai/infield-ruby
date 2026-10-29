@@ -51,6 +51,8 @@ module Infield
 
           git_branch, git_sha = git_info
 
+          ignore_infield_host_in_vcr!
+
           webmock_needs_re_enabling = false
           if defined?(WebMock) && WebMock.respond_to?(:net_connect_allowed?) &&
              !WebMock.net_connect_allowed?(Infield.infield_api_url)
@@ -138,6 +140,15 @@ module Infield
         messages = messages.select(&method(:valid_message)) unless validated
         messages.each { |message| Runner.enqueue(Task.new(message, callstack)) }
         true
+      end
+
+      def ignore_infield_host_in_vcr!
+        return if @vcr_host_ignored
+        return unless defined?(VCR) && VCR.respond_to?(:configuration) &&
+                      VCR.configuration.respond_to?(:ignore_hosts)
+
+        VCR.configuration.ignore_hosts(infield_api_uri.host)
+        @vcr_host_ignored = true
       end
 
       private

@@ -27,6 +27,8 @@ module Infield
         private
 
         def send_heartbeat
+          DeprecationWarning::Runner.ignore_infield_host_in_vcr!
+
           uri = URI.parse(Infield.infield_api_url)
           Net::HTTP.start(uri.host, uri.port, use_ssl: (uri.scheme == 'https')) do |http|
             http.post('/api/heartbeats',
